@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-backend-api.onrender.com/api/:path*"
+      "destination": "https://sniplink-backend-0xr5.onrender.com"
     },
     {
       "source": "/:path*",
