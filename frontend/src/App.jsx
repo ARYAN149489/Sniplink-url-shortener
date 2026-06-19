@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import RedirectHandler from './pages/RedirectHandler';
 
 const App = () => {
   return (
@@ -45,6 +46,7 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/:code" element={<RedirectHandler />} />
         </Routes>
         <Footer />
       </AuthProvider>
