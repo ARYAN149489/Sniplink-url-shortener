@@ -25,9 +25,30 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check endpoint (bypasses rate limiter)
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+const mongoose = require('mongoose');
+const { pingRedis } = require('./config/redis');
+
+// Health check endpoint (bypasses rate limiter, keeps Render, MongoDB, and Redis warm)
+app.get('/api/health', async (req, res) => {
+  const mongoStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+
+  let redisStatus = 'offline';
+  try {
+    const isAlive = await pingRedis();
+    if (isAlive) redisStatus = 'connected';
+  } catch {
+    redisStatus = 'error';
+  }
+
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    services: {
+      mongodb: mongoStatus,
+      redis: redisStatus,
+    },
+  });
 });
 
 // API routes protected by global apiLimiter

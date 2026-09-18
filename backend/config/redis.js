@@ -105,10 +105,26 @@ const invalidateUrlCache = async (code) => {
   }
 };
 
+/**
+ * Ping Redis server to verify connectivity
+ * @returns {Promise<boolean>}
+ */
+const pingRedis = async () => {
+  if (!isConnected || !redisClient) return false;
+  try {
+    const res = await redisClient.ping();
+    return res === 'PONG';
+  } catch {
+    return false;
+  }
+};
+
 module.exports = {
   redisClient,
   getUrlCache,
   setUrlCache,
   invalidateUrlCache,
+  pingRedis,
   isRedisConnected: () => isConnected,
 };
+

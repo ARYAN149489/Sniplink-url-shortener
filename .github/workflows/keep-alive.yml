@@ -1,0 +1,29 @@
+name: Keep Alive Ping (Render, MongoDB & Redis)
+
+on:
+  schedule:
+    # Runs every 14 minutes to prevent Render free-tier sleep (15 min idle timeout)
+    # and keeps MongoDB & Upstash Redis active
+    - cron: '*/14 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  ping-service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Backend Health Endpoint
+        run: |
+          URL="https://sniplink-backend-0xr5.onrender.com/api/health"
+          echo "Sending keep-alive ping to $URL..."
+          HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" "$URL")
+          BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
+          STATUS=$(echo "$HTTP_RESPONSE" | tail -n1)
+
+          echo "Response Status: $STATUS"
+          echo "Response Body: $BODY"
+
+          if [ "$STATUS" -ne 200 ]; then
+            echo "⚠️ Warning: Expected status 200 but received $STATUS"
+          else
+            echo "✅ Keep-alive ping successful!"
+          fi
