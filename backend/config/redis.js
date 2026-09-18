@@ -1,6 +1,11 @@
 const Redis = require('ioredis');
 
-const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+let redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+
+// Automatically upgrade Upstash URLs to TLS (rediss://) if entered with redis://
+if (redisUrl.includes('upstash.io') && redisUrl.startsWith('redis://')) {
+  redisUrl = redisUrl.replace('redis://', 'rediss://');
+}
 
 let redisClient = null;
 let isConnected = false;
@@ -8,7 +13,7 @@ let isConnected = false;
 try {
   redisClient = new Redis(redisUrl, {
     maxRetriesPerRequest: 1,
-    connectTimeout: 3000,
+    connectTimeout: 5000,
     lazyConnect: true,
     retryStrategy(times) {
       if (times > 5) {
