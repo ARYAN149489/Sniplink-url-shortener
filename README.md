@@ -3,11 +3,11 @@
 [![React](https://img.shields.io/badge/Frontend-React%20%7C%20Vite-blue?style=for-the-badge&logo=react)](https://react.dev)
 [![Node.js](https://img.shields.io/badge/Backend-Node.js%20%7C%20Express-green?style=for-the-badge&logo=node.js)](https://nodejs.org)
 [![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Atlas-darkgreen?style=for-the-badge&logo=mongodb)](https://www.mongodb.com)
-[![Deployment](https://img.shields.io/badge/Hosted-Vercel%20%26%20Render-blueviolet?style=for-the-badge)](https://sniplink-url-shortener-delta.vercel.app/)
+[![Deployment](https://img.shields.io/badge/Hosted-Vercel%20%26%20Render-blueviolet?style=for-the-badge)](https://snipplink.vercel.app/)
 
 A high-performance, full-stack Single Page Application (SPA) that lets users shorten URLs, configure custom aliases, set link expiration, and view granular click metrics on an interactive dashboard.
 
-🌐 **Live Demo:** [https://sniplink-url-shortener-delta.vercel.app/](https://sniplink-url-shortener-delta.vercel.app/)
+🌐 **Live Demo:** [https://snipplink.vercel.app/](https://snipplink.vercel.app/)
 
 ---
 
