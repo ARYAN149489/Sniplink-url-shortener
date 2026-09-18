@@ -5,7 +5,27 @@
       "destination": "https://sniplink-backend-0xr5.onrender.com/api/:path*"
     },
     {
-      "source": "/:path*",
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/:code",
+      "destination": "https://sniplink-backend-0xr5.onrender.com/:code"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
