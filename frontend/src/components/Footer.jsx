@@ -5,7 +5,7 @@ const Footer = () => {
     <footer className="footer container">
       <p>
         Built with ❤️ by SnipLink ·{' '}
-        <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+        <a href="https://github.com/ARYAN149489/Sniplink-url-shortener/" target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
       </p>
