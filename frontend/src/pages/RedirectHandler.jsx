@@ -25,8 +25,8 @@ const RedirectHandler = () => {
       color: 'var(--text-secondary)'
     }}>
       <LoadingSpinner size="lg" />
-      <p style={{ marginTop: 'var(--space-md)', fontSize: '1.1rem' }}>
-        Redirecting you to your destination...
+      <p style={{ marginTop: 'var(--space-md)', fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+        Resolving link <code className="font-mono" style={{ color: 'var(--primary-text)' }}>/{code}</code>...
       </p>
     </div>
   );

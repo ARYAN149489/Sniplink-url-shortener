@@ -9,12 +9,12 @@ import { Line } from 'react-chartjs-2';
 import toast from 'react-hot-toast';
 import * as api from '../api/api';
 import {
-  FiPlus, FiLink, FiEye, FiTrendingUp, FiStar,
-  FiCopy, FiBarChart2, FiTrash2, FiSearch, FiX,
+  FiPlus, FiLink, FiEye, FiTrendingUp, FiActivity,
+  FiCopy, FiBarChart2, FiTrash2, FiSearch, FiX, FiCheck,
+  FiGlobe, FiSmartphone, FiMonitor, FiExternalLink, FiClock
 } from 'react-icons/fi';
 import './Dashboard.css';
 
-// Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Filler);
 
 const Dashboard = () => {
@@ -25,6 +25,7 @@ const Dashboard = () => {
   const [loadingLinks, setLoadingLinks] = useState(true);
   const [modalData, setModalData] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
   const debounceRef = useRef(null);
 
   const loadOverview = useCallback(async () => {
@@ -32,7 +33,7 @@ const Dashboard = () => {
       const data = await api.get('/analytics/overview');
       setOverview(data);
     } catch (error) {
-      toast.error('Failed to load analytics: ' + error.message);
+      toast.error('Failed to load telemetry: ' + error.message);
     } finally {
       setLoadingOverview(false);
     }
@@ -43,7 +44,7 @@ const Dashboard = () => {
     try {
       const params = searchTerm ? `?search=${encodeURIComponent(searchTerm)}` : '';
       const data = await api.get(`/url/my-links${params}`);
-      setLinks(data.urls);
+      setLinks(data.urls || []);
     } catch (error) {
       toast.error('Failed to load links: ' + error.message);
     } finally {
@@ -62,20 +63,22 @@ const Dashboard = () => {
     debounceRef.current = setTimeout(() => loadLinks(value), 300);
   };
 
-  const handleCopy = async (url) => {
+  const handleCopy = async (url, id) => {
     try {
       await navigator.clipboard.writeText(url);
-      toast.success('Link copied!');
+      setCopiedId(id);
+      toast.success('Link copied to clipboard');
+      setTimeout(() => setCopiedId(null), 2000);
     } catch {
-      toast.error('Failed to copy.');
+      toast.error('Failed to copy');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this link? This action cannot be undone.')) return;
+    if (!confirm('Are you sure you want to permanently decommission this short link?')) return;
     try {
       await api.del(`/url/${id}`);
-      toast.success('Link deleted.');
+      toast.success('Short link decommissioned');
       setLinks((prev) => prev.filter((l) => l.id !== id));
       loadOverview();
     } catch (error) {
@@ -99,7 +102,7 @@ const Dashboard = () => {
 
   const closeModal = () => setModalData(null);
 
-  // Chart data
+  // Modern Chart.js Config
   const chartData = overview?.clicksOverTime
     ? {
         labels: overview.clicksOverTime.map((d) => {
@@ -110,21 +113,21 @@ const Dashboard = () => {
           {
             label: 'Clicks',
             data: overview.clicksOverTime.map((d) => d.clicks),
-            borderColor: '#8b5cf6',
+            borderColor: '#3b82f6',
             backgroundColor: (ctx) => {
-              const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
-              gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
-              gradient.addColorStop(1, 'rgba(139, 92, 246, 0.01)');
+              const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, 260);
+              gradient.addColorStop(0, 'rgba(59, 130, 246, 0.22)');
+              gradient.addColorStop(1, 'rgba(59, 130, 246, 0.00)');
               return gradient;
             },
-            borderWidth: 2.5,
-            pointRadius: 0,
-            pointHoverRadius: 6,
-            pointHoverBackgroundColor: '#8b5cf6',
-            pointHoverBorderColor: '#fff',
+            borderWidth: 2,
+            pointRadius: 2,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: '#3b82f6',
+            pointHoverBorderColor: '#ffffff',
             pointHoverBorderWidth: 2,
             fill: true,
-            tension: 0.4,
+            tension: 0.3,
           },
         ],
       }
@@ -137,14 +140,16 @@ const Dashboard = () => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: 'rgba(15, 15, 30, 0.95)',
-        titleColor: '#e8e8f0',
-        bodyColor: '#9a9ab5',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: '#0f131c',
+        titleColor: '#f8fafc',
+        bodyColor: '#94a3b8',
+        borderColor: '#28334b',
         borderWidth: 1,
-        padding: 12,
-        cornerRadius: 8,
+        padding: 10,
+        cornerRadius: 6,
         displayColors: false,
+        titleFont: { family: 'Inter', size: 12, weight: '600' },
+        bodyFont: { family: 'JetBrains Mono', size: 12 },
         callbacks: {
           label: (item) => `${item.raw} click${item.raw !== 1 ? 's' : ''}`,
         },
@@ -152,74 +157,75 @@ const Dashboard = () => {
     },
     scales: {
       x: {
-        grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
-        ticks: { color: '#6a6a85', font: { size: 11, family: 'Inter' }, maxRotation: 0, maxTicksLimit: 8 },
+        grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false },
+        ticks: { color: '#64748b', font: { size: 11, family: 'Inter' }, maxRotation: 0, maxTicksLimit: 8 },
       },
       y: {
         beginAtZero: true,
-        grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
-        ticks: { color: '#6a6a85', font: { size: 11, family: 'Inter' }, stepSize: 1 },
+        grid: { color: 'rgba(255, 255, 255, 0.03)', drawBorder: false },
+        ticks: { color: '#64748b', font: { size: 11, family: 'JetBrains Mono' }, stepSize: 1 },
       },
     },
   };
 
   const avgClicks = overview && overview.totalLinks > 0
-    ? Math.round(overview.totalClicks / overview.totalLinks)
+    ? Math.round((overview.totalClicks / overview.totalLinks) * 10) / 10
     : 0;
 
   return (
     <main className="page-content">
-      <div className="container">
+      <div className="container dashboard-container">
         {/* Header */}
         <div className="dashboard-header animate-slide-up">
           <div>
-            <h1>Dashboard</h1>
-            <p className="text-muted" style={{ marginTop: '4px' }}>Your link analytics at a glance</p>
+            <div className="dashboard-badge-row">
+              <span className="badge badge-info">Link Telemetry Hub</span>
+            </div>
+            <h1>Analytics & Links</h1>
+            <p className="dashboard-subtitle">
+              Monitor traffic distribution, referrer telemetry, and link lifecycles in real time.
+            </p>
           </div>
           <Link to="/" className="btn btn-primary">
-            <FiPlus size={16} /> New Link
+            <FiPlus size={16} />
+            <span>Create New Link</span>
           </Link>
         </div>
 
         {/* Stats Grid */}
         <div className="stats-grid animate-slide-up stagger-1">
           <StatCard
-            icon={<FiLink size={22} />}
-            iconBg="rgba(139, 92, 246, 0.1)"
-            iconColor="var(--accent-start)"
+            icon={<FiLink size={18} />}
             value={overview?.totalLinks ?? '—'}
-            label="Total Links"
+            label="Active Links"
           />
           <StatCard
-            icon={<FiEye size={22} />}
-            iconBg="rgba(52, 211, 153, 0.1)"
-            iconColor="var(--color-success)"
+            icon={<FiEye size={18} />}
             value={overview?.totalClicks ?? '—'}
-            label="Total Clicks"
+            label="Total Redirects"
           />
           <StatCard
-            icon={<FiTrendingUp size={22} />}
-            iconBg="rgba(96, 165, 250, 0.1)"
-            iconColor="var(--color-info)"
+            icon={<FiTrendingUp size={18} />}
             value={avgClicks}
-            label="Avg. Clicks/Link"
+            label="Average Clicks / Link"
           />
           <StatCard
-            icon={<FiStar size={22} />}
-            iconBg="rgba(251, 191, 36, 0.1)"
-            iconColor="var(--color-warning)"
+            icon={<FiActivity size={18} />}
             value={overview?.topLink?.clicks ?? '—'}
-            label="Top Link Clicks"
+            label="Top Link Volume"
             subtitle={overview?.topLink?.shortUrl}
           />
         </div>
 
-        {/* Clicks Chart */}
+        {/* Clicks Trend Chart */}
         {chartData && (
-          <div className="card chart-container animate-slide-up stagger-2">
+          <div className="card chart-card animate-slide-up stagger-2">
             <div className="chart-header">
-              <h3>Clicks Over Time</h3>
-              <span className="badge badge-info">Last 30 days</span>
+              <div>
+                <h3>Traffic Volume</h3>
+                <span className="chart-sub">Aggregated click trends over the past 30 days</span>
+              </div>
+              <span className="badge badge-info font-mono">30-day window</span>
             </div>
             <div className="chart-wrapper">
               <Line data={chartData} options={chartOptions} />
@@ -227,65 +233,119 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Links Table */}
+        {/* Links Table Section */}
         <div className="card links-section animate-slide-up stagger-3">
           <div className="links-header">
-            <h3>Your Links</h3>
+            <div>
+              <h3>Provisioned URLs</h3>
+              <span className="links-count font-mono">{links.length} total entries</span>
+            </div>
             <div className="search-input-wrapper">
               <FiSearch size={14} className="search-icon-el" />
               <input
                 type="text"
-                className="form-input"
-                placeholder="Search links..."
+                className="form-input search-input"
+                placeholder="Search short code or URL..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 aria-label="Search links"
               />
+              {search && (
+                <button
+                  className="search-clear-btn"
+                  onClick={() => handleSearch('')}
+                  aria-label="Clear search"
+                >
+                  <FiX size={12} />
+                </button>
+              )}
             </div>
           </div>
 
           {loadingLinks ? (
-            <div className="loading-container"><span className="spinner spinner-lg" /></div>
+            <div className="loading-state">
+              <span className="spinner spinner-lg" />
+              <p className="text-muted" style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}>
+                Fetching link inventory...
+              </p>
+            </div>
           ) : links.length === 0 ? (
             <div className="empty-state">
-              <div className="empty-icon">🔗</div>
-              <h3>No links yet</h3>
-              <p>Create your first shortened URL to see it here.</p>
-              <Link to="/" className="btn btn-primary">Create Your First Link</Link>
+              <div className="empty-icon-wrap">
+                <FiLink size={24} />
+              </div>
+              <h3>No short links found</h3>
+              <p className="text-muted">
+                {search ? 'No links match your current search query.' : 'Generate your first shortened link to initiate click telemetry.'}
+              </p>
+              {!search && (
+                <Link to="/" className="btn btn-secondary btn-sm" style={{ marginTop: '0.75rem' }}>
+                  Create Short Link
+                </Link>
+              )}
             </div>
           ) : (
             <div className="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>Short Link</th>
-                    <th>Original URL</th>
+                    <th>Short Code</th>
+                    <th>Destination URL</th>
                     <th>Clicks</th>
                     <th>Created</th>
-                    <th>Actions</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {links.map((link) => (
                     <tr key={link.id}>
                       <td>
-                        <a href={link.shortUrl} target="_blank" rel="noopener noreferrer" className="table-link">
+                        <a
+                          href={link.shortUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="table-slug-badge font-mono"
+                          title="Open link in new tab"
+                        >
                           /{link.customAlias || link.shortCode}
+                          <FiExternalLink size={10} className="external-hint" />
                         </a>
                       </td>
-                      <td className="table-url" title={link.originalUrl}>{link.originalUrl}</td>
-                      <td><span style={{ fontWeight: 600 }}>{link.clicks}</span></td>
-                      <td>{new Date(link.createdAt).toLocaleDateString()}</td>
+                      <td className="table-destination-cell" title={link.originalUrl}>
+                        {link.originalUrl}
+                      </td>
                       <td>
-                        <div className="action-btns">
-                          <button className="btn btn-ghost btn-sm" onClick={() => handleCopy(link.shortUrl)} title="Copy link">
-                            <FiCopy size={14} />
+                        <span className="font-mono clicks-num">{link.clicks}</span>
+                      </td>
+                      <td className="font-mono text-muted" style={{ fontSize: '0.8rem' }}>
+                        {new Date(link.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </td>
+                      <td>
+                        <div className="table-actions">
+                          <button
+                            className="btn btn-ghost btn-sm action-btn"
+                            onClick={() => handleCopy(link.shortUrl, link.id)}
+                            title="Copy short link"
+                          >
+                            {copiedId === link.id ? <FiCheck size={13} color="#10b981" /> : <FiCopy size={13} />}
                           </button>
-                          <button className="btn btn-ghost btn-sm" onClick={() => viewAnalytics(link.customAlias || link.shortCode)} title="View analytics">
-                            <FiBarChart2 size={14} />
+                          <button
+                            className="btn btn-ghost btn-sm action-btn"
+                            onClick={() => viewAnalytics(link.customAlias || link.shortCode)}
+                            title="View click telemetry"
+                          >
+                            <FiBarChart2 size={13} />
                           </button>
-                          <button className="btn btn-ghost btn-sm" onClick={() => handleDelete(link.id)} title="Delete" style={{ color: 'var(--color-error)' }}>
-                            <FiTrash2 size={14} />
+                          <button
+                            className="btn btn-ghost btn-sm action-btn btn-delete"
+                            onClick={() => handleDelete(link.id)}
+                            title="Decommission link"
+                          >
+                            <FiTrash2 size={13} />
                           </button>
                         </div>
                       </td>
@@ -297,68 +357,119 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Recent Activity */}
+        {/* Recent Traffic Telemetry Stream */}
         {overview?.recentClicks && overview.recentClicks.length > 0 && (
-          <div className="card animate-slide-up stagger-4" style={{ marginBottom: 'var(--space-2xl)', marginTop: 'var(--space-xl)' }}>
-            <h3 style={{ marginBottom: 'var(--space-lg)' }}>Recent Activity</h3>
-            {overview.recentClicks.map((click, i) => (
-              <div key={i} className="activity-item">
-                <div>
-                  <div style={{ fontWeight: 500, fontSize: '0.9rem' }}>
-                    {click.url ? `/${click.url.shortCode}` : 'Unknown'}
-                  </div>
-                  <div className="text-muted" style={{ fontSize: '0.8rem', marginTop: '2px' }}>
-                    {click.browser} · {click.os} · {click.device}
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div className="text-muted" style={{ fontSize: '0.8rem' }}>
-                    {timeAgo(click.timestamp)}
-                  </div>
-                  <div className="text-muted" style={{ fontSize: '0.75rem', marginTop: '2px' }}>
-                    {click.referrer === 'Direct' ? 'Direct' : truncate(click.referrer, 30)}
-                  </div>
-                </div>
+          <div className="card activity-card animate-slide-up stagger-4">
+            <div className="activity-header">
+              <div className="activity-title-group">
+                <FiClock size={16} className="text-secondary" />
+                <h3>Live Dispatch Log</h3>
               </div>
-            ))}
+              <span className="badge badge-success font-mono">
+                <span className="status-dot" /> Real-Time Telemetry
+              </span>
+            </div>
+
+            <div className="activity-list">
+              {overview.recentClicks.map((click, i) => (
+                <div key={i} className="activity-item">
+                  <div className="activity-left">
+                    <div className="activity-slug font-mono">
+                      {click.url ? `/${click.url.shortCode}` : '/dispatch'}
+                    </div>
+                    <div className="activity-details">
+                      <span>{click.browser || 'Browser'}</span>
+                      <span className="sep">·</span>
+                      <span>{click.os || 'OS'}</span>
+                      <span className="sep">·</span>
+                      <span>{click.device || 'Desktop'}</span>
+                    </div>
+                  </div>
+
+                  <div className="activity-right">
+                    <span className="activity-time font-mono">
+                      {timeAgo(click.timestamp)}
+                    </span>
+                    <span className="activity-referrer" title={click.referrer}>
+                      {click.referrer === 'Direct' ? 'Direct traffic' : click.referrer}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
       {/* Analytics Modal */}
       {modalData && (
-        <div className="modal-overlay visible" onClick={(e) => e.target === e.currentTarget && closeModal()}>
-          <div className="modal">
+        <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && closeModal()}>
+          <div className="modal-dialog">
             <div className="modal-header">
-              <h2>Link Analytics</h2>
-              <button className="btn btn-ghost btn-icon" onClick={closeModal} aria-label="Close">
-                <FiX size={20} />
+              <div>
+                <span className="badge badge-info font-mono" style={{ marginBottom: '0.4rem' }}>
+                  Telemetry Inspection
+                </span>
+                <h2>Link Analytics</h2>
+              </div>
+              <button className="btn btn-ghost btn-icon modal-close-btn" onClick={closeModal} aria-label="Close">
+                <FiX size={18} />
               </button>
             </div>
-            <div className="modal-body">
+
+            <div className="modal-content">
               {modalLoading ? (
-                <div className="loading-container"><span className="spinner spinner-lg" /></div>
+                <div className="modal-loading">
+                  <span className="spinner spinner-lg" />
+                  <p className="text-muted" style={{ marginTop: '0.75rem', fontSize: '0.85rem' }}>
+                    Compiling telemetry aggregates...
+                  </p>
+                </div>
               ) : modalData.url ? (
                 <>
-                  <div className="modal-url-info">
-                    <div className="result-url" style={{ marginBottom: 'var(--space-md)' }}>
-                      <div>
-                        <a href={modalData.url.shortUrl} target="_blank" rel="noopener noreferrer" className="short-link">
-                          {modalData.url.shortUrl}
-                        </a>
-                        <div className="original-link">{modalData.url.originalUrl}</div>
-                      </div>
+                  <div className="modal-summary-panel">
+                    <div className="modal-link-details">
+                      <a
+                        href={modalData.url.shortUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="modal-short-link font-mono"
+                      >
+                        {modalData.url.shortUrl}
+                        <FiExternalLink size={12} />
+                      </a>
+                      <span className="modal-original-url" title={modalData.url.originalUrl}>
+                        {modalData.url.originalUrl}
+                      </span>
                     </div>
-                    <div className="modal-stats">
-                      <span style={{ fontSize: '2rem', fontWeight: 800 }}>{modalData.url.totalClicks}</span>
-                      <span className="text-muted" style={{ fontSize: '0.85rem', marginLeft: '0.5rem' }}>total clicks</span>
+                    <div className="modal-click-metric font-mono">
+                      <span className="metric-num">{modalData.url.totalClicks}</span>
+                      <span className="metric-label">total clicks</span>
                     </div>
                   </div>
 
-                  <Breakdown title="Top Browsers" items={modalData.analytics?.browsers} />
-                  <Breakdown title="Devices" items={modalData.analytics?.devices} />
-                  <Breakdown title="Operating Systems" items={modalData.analytics?.operatingSystems} />
-                  <Breakdown title="Referrers" items={modalData.analytics?.referrers} />
+                  <div className="breakdown-grid">
+                    <BreakdownCard
+                      title="Web Browsers"
+                      icon={<FiGlobe size={15} />}
+                      items={modalData.analytics?.browsers}
+                    />
+                    <BreakdownCard
+                      title="Operating Systems"
+                      icon={<FiMonitor size={15} />}
+                      items={modalData.analytics?.operatingSystems}
+                    />
+                    <BreakdownCard
+                      title="Device Classes"
+                      icon={<FiSmartphone size={15} />}
+                      items={modalData.analytics?.devices}
+                    />
+                    <BreakdownCard
+                      title="Traffic Referrers"
+                      icon={<FiActivity size={15} />}
+                      items={modalData.analytics?.referrers}
+                    />
+                  </div>
                 </>
               ) : null}
             </div>
@@ -369,29 +480,34 @@ const Dashboard = () => {
   );
 };
 
-/* ─── Sub-components ───────────────────────────────────────── */
+/* ─── Sub-Components ────────────────────────────────────────── */
 
-const StatCard = ({ icon, iconBg, iconColor, value, label, subtitle }) => (
+const StatCard = ({ icon, value, label, subtitle }) => (
   <div className="card stat-card">
-    <div className="stat-icon" style={{ background: iconBg, color: iconColor }}>
-      {icon}
+    <div className="stat-top">
+      <span className="stat-label">{label}</span>
+      <div className="stat-icon-wrap">{icon}</div>
     </div>
-    <span className="stat-value">{value}</span>
+    <div className="stat-value font-mono">{value}</div>
     {subtitle && (
-      <a href={subtitle} target="_blank" rel="noopener noreferrer" className="stat-subtitle">
+      <a href={subtitle} target="_blank" rel="noopener noreferrer" className="stat-subtitle font-mono">
         {subtitle}
       </a>
     )}
-    <span className="stat-label">{label}</span>
   </div>
 );
 
-const Breakdown = ({ title, items }) => {
+const BreakdownCard = ({ title, icon, items }) => {
   if (!items || items.length === 0) {
     return (
-      <div style={{ marginBottom: 'var(--space-lg)' }}>
-        <h4 className="breakdown-title">{title}</h4>
-        <p className="text-muted" style={{ fontSize: '0.85rem' }}>No data yet</p>
+      <div className="breakdown-card">
+        <div className="breakdown-header">
+          {icon}
+          <h4>{title}</h4>
+        </div>
+        <p className="text-muted" style={{ fontSize: '0.8rem', padding: '0.5rem 0' }}>
+          No data recorded yet
+        </p>
       </div>
     );
   }
@@ -399,27 +515,32 @@ const Breakdown = ({ title, items }) => {
   const total = items.reduce((sum, i) => sum + i.count, 0);
 
   return (
-    <div style={{ marginBottom: 'var(--space-lg)' }}>
-      <h4 className="breakdown-title">{title}</h4>
-      {items.slice(0, 5).map((item, i) => {
-        const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
-        return (
-          <div key={i} className="breakdown-item">
-            <div className="breakdown-row">
-              <span style={{ fontSize: '0.85rem' }}>{item.name}</span>
-              <span className="text-muted" style={{ fontSize: '0.8rem' }}>{item.count} ({pct}%)</span>
+    <div className="breakdown-card">
+      <div className="breakdown-header">
+        {icon}
+        <h4>{title}</h4>
+      </div>
+      <div className="breakdown-list">
+        {items.slice(0, 5).map((item, i) => {
+          const pct = total > 0 ? Math.round((item.count / total) * 100) : 0;
+          return (
+            <div key={i} className="breakdown-row">
+              <div className="breakdown-row-info">
+                <span className="breakdown-name">{item.name || 'Unknown'}</span>
+                <span className="breakdown-num font-mono">{item.count} ({pct}%)</span>
+              </div>
+              <div className="breakdown-track">
+                <div className="breakdown-fill" style={{ width: `${pct}%` }} />
+              </div>
             </div>
-            <div className="breakdown-bar-bg">
-              <div className="breakdown-bar" style={{ width: `${pct}%` }} />
-            </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };
 
-/* ─── Utility Functions ────────────────────────────────────── */
+/* ─── Utilities ────────────────────────────────────────────── */
 
 const timeAgo = (date) => {
   const seconds = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -428,11 +549,6 @@ const timeAgo = (date) => {
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
   return new Date(date).toLocaleDateString();
-};
-
-const truncate = (str, len) => {
-  if (!str || str.length <= len) return str;
-  return str.substring(0, len) + '...';
 };
 
 export default Dashboard;

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../components/Logo';
 import './Auth.css';
 
 const Signup = () => {
@@ -12,7 +13,6 @@ const Signup = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // Redirect if already logged in
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -32,26 +32,31 @@ const Signup = () => {
 
     const success = await signup(name, email, password);
     if (success) {
-      setTimeout(() => navigate('/dashboard'), 500);
+      setTimeout(() => navigate('/dashboard'), 400);
     }
   };
 
   return (
     <main className="auth-page">
-      <div className="card card-glass card-glow auth-card">
-        <h1>Create account</h1>
-        <p className="auth-subtitle">Start shortening URLs and tracking analytics for free</p>
+      <div className="auth-card animate-slide-up">
+        <div className="auth-brand-header">
+          <Logo size={36} />
+          <h1>Create SnipLink Account</h1>
+          <p className="auth-subtitle">
+            Deploy short URLs with sub-millisecond edge redirection and click analytics
+          </p>
+        </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="signup-name" className="form-label">
-              Name <span style={{ color: 'var(--text-muted)' }}>(optional)</span>
+              Full Name <span className="text-muted">(Optional)</span>
             </label>
             <input
               type="text"
               id="signup-name"
               className="form-input"
-              placeholder="Your name"
+              placeholder="Alex Doe"
               autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -59,12 +64,12 @@ const Signup = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="signup-email" className="form-label">Email address</label>
+            <label htmlFor="signup-email" className="form-label">Work Email</label>
             <input
               type="email"
               id="signup-email"
               className="form-input"
-              placeholder="you@example.com"
+              placeholder="developer@company.com"
               required
               autoComplete="email"
               value={email}
@@ -78,7 +83,7 @@ const Signup = () => {
               type="password"
               id="signup-password"
               className="form-input"
-              placeholder="At least 6 characters"
+              placeholder="Minimum 6 characters"
               required
               minLength={6}
               autoComplete="new-password"
@@ -88,12 +93,12 @@ const Signup = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="signup-confirm-password" className="form-label">Confirm password</label>
+            <label htmlFor="signup-confirm-password" className="form-label">Confirm Password</label>
             <input
               type="password"
               id="signup-confirm-password"
               className="form-input"
-              placeholder="Re-enter your password"
+              placeholder="Re-enter password"
               required
               minLength={6}
               autoComplete="new-password"
@@ -102,8 +107,15 @@ const Signup = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-lg" disabled={loading} style={{ width: '100%' }}>
-            {loading ? <><span className="spinner" /> Creating account...</> : 'Create Account'}
+          <button type="submit" className="btn btn-primary submit-auth-btn" disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner" />
+                <span>Creating Account...</span>
+              </>
+            ) : (
+              'Create Free Account'
+            )}
           </button>
         </form>
 

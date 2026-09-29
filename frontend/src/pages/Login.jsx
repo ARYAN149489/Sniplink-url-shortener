@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Logo from '../components/Logo';
 import './Auth.css';
 
 const Login = () => {
@@ -9,7 +10,6 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  // Redirect if already logged in
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -18,15 +18,20 @@ const Login = () => {
     e.preventDefault();
     const success = await login(email, password);
     if (success) {
-      setTimeout(() => navigate('/dashboard'), 500);
+      setTimeout(() => navigate('/dashboard'), 400);
     }
   };
 
   return (
     <main className="auth-page">
-      <div className="card card-glass card-glow auth-card">
-        <h1>Welcome back</h1>
-        <p className="auth-subtitle">Sign in to your account to continue</p>
+      <div className="auth-card animate-slide-up">
+        <div className="auth-brand-header">
+          <Logo size={36} />
+          <h1>Sign in to SnipLink</h1>
+          <p className="auth-subtitle">
+            Enter your credentials to access your link analytics dashboard
+          </p>
+        </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -35,7 +40,7 @@ const Login = () => {
               type="email"
               id="login-email"
               className="form-input"
-              placeholder="you@example.com"
+              placeholder="developer@company.com"
               required
               autoComplete="email"
               value={email}
@@ -49,7 +54,7 @@ const Login = () => {
               type="password"
               id="login-password"
               className="form-input"
-              placeholder="Enter your password"
+              placeholder="••••••••••••"
               required
               minLength={6}
               autoComplete="current-password"
@@ -58,13 +63,20 @@ const Login = () => {
             />
           </div>
 
-          <button type="submit" className="btn btn-primary btn-lg" disabled={loading} style={{ width: '100%' }}>
-            {loading ? <><span className="spinner" /> Signing in...</> : 'Sign In'}
+          <button type="submit" className="btn btn-primary submit-auth-btn" disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner" />
+                <span>Authenticating...</span>
+              </>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
 
         <div className="auth-footer">
-          Don&apos;t have an account? <Link to="/signup">Create one</Link>
+          Don&apos;t have an account yet? <Link to="/signup">Create one</Link>
         </div>
       </div>
     </main>
