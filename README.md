@@ -1,4 +1,4 @@
-# 🔗 SnipLink — Real-Time URL Shortener
+# SnipLink — Real-Time URL Shortener
 
 [![React](https://img.shields.io/badge/Frontend-React%20%7C%20Vite-blue?style=for-the-badge&logo=react)](https://react.dev)
 [![Node.js](https://img.shields.io/badge/Backend-Node.js%20%7C%20Express-green?style=for-the-badge&logo=node.js)](https://nodejs.org)
@@ -7,16 +7,16 @@
 
 A high-performance, full-stack Single Page Application (SPA) that lets users shorten URLs, configure custom aliases, set link expiration, and view granular click metrics on an interactive dashboard.
 
-🌐 **Live Demo:** [https://snipplink.vercel.app/](https://snipplink.vercel.app/)
+**Live Demo:** [https://snipplink.vercel.app/](https://snipplink.vercel.app/)
 
 ---
 
-## 🔍 Profile Analyst Review
-> 💡 **Developer Profile Impact**: This repository serves as a high-signal engineering benchmark. It demonstrates strong REST API design patterns, clean separation of concerns, secure state tracking (JWT), and real-time visualization of aggregations (Chart.js) without relying on bloated libraries.
+## Profile Analyst Review
+> **Developer Profile Impact**: This repository serves as a high-signal engineering benchmark. It demonstrates strong REST API design patterns, clean separation of concerns, secure state tracking (JWT), and real-time visualization of aggregations (Chart.js) without relying on bloated libraries.
 
 ---
 
-## ⚡ Key Highlights
+## Key Highlights
 * **Interactive Redirection & Analytics**: Tracks browser type, operating system, device model, and traffic referrers dynamically upon link usage.
 * **Dual-Mode Access**: Unlocks full dashboard suites upon registration, while keeping standard anonymous shortening open to guest visitors.
 * **Smart Index Optimization**: Uses unique MongoDB sparse indexes on custom domain slugs to prevent collisions while permitting empty properties.
@@ -24,7 +24,7 @@ A high-performance, full-stack Single Page Application (SPA) that lets users sho
 
 ---
 
-## 📁 Repository Map
+## Repository Map
 
 ```text
 ├── backend/
@@ -41,7 +41,7 @@ A high-performance, full-stack Single Page Application (SPA) that lets users sho
 
 ---
 
-## 🛠️ Local Installation
+## Local Installation
 
 ### 1. Backend Service
 ```bash
@@ -61,6 +61,6 @@ npm run dev
 
 ---
 
-## 🌐 Production Architecture
+## Production Architecture
 * **Frontend**: React client deployed via **Vercel** with client-side fallback rewrites (`vercel.json`).
 * **Backend**: Express service hosted on **Render** (linked with MongoDB Atlas).
