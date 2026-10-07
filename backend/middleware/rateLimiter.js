@@ -21,7 +21,7 @@ const apiLimiter = rateLimit({
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   handler: rateLimitHandler('Too many requests from this IP. Please try again later.'),
-  skip: (req) => req.path === '/health', // Don't rate limit uptime monitoring checks
+  skip: (req) => req.path === '/health' || req.path === '/api/health' || req.path.endsWith('/health'), // Don't rate limit uptime monitoring checks
 });
 
 /**

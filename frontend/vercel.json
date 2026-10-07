@@ -5,6 +5,14 @@
       "destination": "https://sniplink-backend-0xr5.onrender.com/api/:path*"
     },
     {
+      "source": "/assets/:path*",
+      "destination": "/assets/:path*"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon.ico"
+    },
+    {
       "source": "/",
       "destination": "/index.html"
     },
@@ -21,7 +29,7 @@
       "destination": "/index.html"
     },
     {
-      "source": "/:code",
+      "source": "/:code([a-zA-Z0-9-_]{3,30})",
       "destination": "https://sniplink-backend-0xr5.onrender.com/:code"
     },
     {
